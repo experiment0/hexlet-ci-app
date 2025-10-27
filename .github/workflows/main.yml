@@ -1,0 +1,40 @@
+# Имя worcflow
+name: Node CI
+
+# На какие действия запускается workflow
+on:
+  - push
+  - pull_request
+
+# Переменная среды
+env:
+  CI: true
+
+jobs:
+  # Произвольное имя задания
+  build:
+    # Операционная система, на которой все будет запущено
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # Какие версии Node использовать
+        node-version: [18.x]
+
+    # Список шагов, которые нужно выполнить
+    steps:
+      # экшн, который клонирует репозиторий
+      - uses: actions/checkout@v4
+      # экшн для установки Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      # установка проекта
+      - run: make install
+      # запуск тестов
+      - run: make lint
+      - run: make test
+      # экшн, созданный командой Hexlet. Выводит строку "Hello from Hexlet!"
+      - uses: hexlet-components/hello-from-hexlet-action@release
